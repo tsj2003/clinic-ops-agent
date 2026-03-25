@@ -16,4 +16,4 @@ services:
         value: https://agent.tinyfish.ai
       - key: TINYFISH_API_KEY
         sync: false
-    healthCheckPath: /
+    healthCheckPath: /api/health
