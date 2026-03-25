@@ -1,0 +1,11 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.env
+.env.local
+node_modules
+web/node_modules
+web/.next
+web/.next-dev
+.DS_Store

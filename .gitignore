@@ -1,0 +1,16 @@
+.env
+.env.local
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+
+node_modules/
+web/node_modules/
+web/.next/
+web/.next-dev/
+web/.next.bak.*/
+
+.vercel/
+.idea/
+.vscode/

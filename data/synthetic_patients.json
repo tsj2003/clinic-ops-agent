@@ -1,0 +1,33 @@
+[
+    {
+        "id": "SYN-84920",
+        "name": "Jane Doe",
+        "dob": "1982-04-12",
+        "diagnosis": "M54.5 - Low back pain",
+        "requested_procedure": "MRI Lumbar Spine (CPT 72148)",
+        "clinical_notes": [
+            "Patient reports 8 weeks of lower back pain radiating to left leg.",
+            "Conservative therapy note: Patient completed 6 weeks of physical therapy with minimal improvement.",
+            "Medications: Ibuprofen 800mg daily. No red flag symptoms."
+        ],
+        "evidence_files": [
+            "jane_doe_clinical_chart.pdf",
+            "jane_doe_pt_notes.pdf"
+        ]
+    },
+    {
+        "id": "SYN-91024",
+        "name": "John Smith",
+        "dob": "1975-11-03",
+        "diagnosis": "M17.11 - Unilateral primary osteoarthritis, right knee",
+        "requested_procedure": "Total Knee Arthroplasty (CPT 27447)",
+        "clinical_notes": [
+            "Patient reports severe right knee pain, unable to walk more than 1 block.",
+            "Weight bearing x-ray shows bone-on-bone joint space narrowing."
+        ],
+        "evidence_files": [
+            "john_smith_chart.pdf",
+            "xray_report.pdf"
+        ]
+    }
+]

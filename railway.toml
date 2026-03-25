@@ -1,0 +1,15 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "npx next start -H 0.0.0.0 -p 3000"
+healthcheckPath = "/"
+healthcheckPort = 3000
+restartPolicyType = "on_failure"
+
+[deploy.env]
+NODE_ENV = "production"
+PORT = "3000"
+HOSTNAME = "0.0.0.0"
+PYTHON_BIN = "python3"

@@ -1,0 +1,5 @@
+rich
+pydantic
+python-dotenv
+requests
+colorama
