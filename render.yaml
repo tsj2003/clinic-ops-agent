@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: authpilot-ai
+    runtime: docker
+    repo: https://github.com/tsj2003/clinic-ops-agent
+    branch: main
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: TINYFISH_MODE
+        value: live
+      - key: TINYFISH_API_BASE_URL
+        value: https://agent.tinyfish.ai
+      - key: TINYFISH_API_KEY
+        sync: false
+    healthCheckPath: /
