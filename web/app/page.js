@@ -384,7 +384,7 @@ export default function HomePage() {
             <div className="mb-6 flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/80">TinyFish Live Build</p>
-                <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">AuthPilot AI</h1>
+                <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">Clinic Ops Agent</h1>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
                   An adaptive prior-authorization agent that thinks, fails, recovers, and completes the workflow in
                   real time.

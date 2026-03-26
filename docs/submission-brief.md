@@ -2,11 +2,11 @@
 
 ## One-line pitch
 
-AuthPilot AI is a TinyFish-powered clinic ops agent that reads live payer policy pages, checks whether a chart is submission-ready, and finds the correct precertification route on the payer site.
+Clinic Ops Agent is a TinyFish-powered clinic ops agent that reads live payer policy pages, checks whether a chart is submission-ready, and finds the correct precertification route on the payer site.
 
 ## Short description
 
-Revenue-cycle teams lose time before they ever enter a portal. Staff read payer policy pages by hand, compare those rules against a chart, and then search the payer website for the right precertification contact path. AuthPilot AI automates that browser-heavy prep work with TinyFish and returns an operator-ready handoff packet.
+Revenue-cycle teams lose time before they ever enter a portal. Staff read payer policy pages by hand, compare those rules against a chart, and then search the payer website for the right precertification contact path. Clinic Ops Agent automates that browser-heavy prep work with TinyFish and returns an operator-ready handoff packet.
 
 ## Why judges should care
 
@@ -25,11 +25,11 @@ Revenue-cycle teams lose time before they ever enter a portal. Staff read payer 
 
 ## Suggested HackerEarth description
 
-AuthPilot AI helps clinics decide whether a prior authorization case is ready before staff waste time in a payer portal. Using TinyFish, the app reads a live payer policy page, extracts evidence requirements, compares them with a synthetic patient chart, and then finds the correct provider precertification route on the payer site. The final output is an operator handoff packet with readiness status, matched evidence, missing evidence, policy source, and the next contact channel.
+Clinic Ops Agent helps clinics decide whether a prior authorization case is ready before staff waste time in a payer portal. Using TinyFish, the app reads a live payer policy page, extracts evidence requirements, compares them with a synthetic patient chart, and then finds the correct provider precertification route on the payer site. The final output is an operator handoff packet with readiness status, matched evidence, missing evidence, policy source, and the next contact channel.
 
 ## Suggested X post copy
 
-Built AuthPilot AI for the @Tiny_fish hackathon.
+Built Clinic Ops Agent for the @Tiny_fish hackathon.
 
 It uses TinyFish live on payer websites to:
 - read policy requirements

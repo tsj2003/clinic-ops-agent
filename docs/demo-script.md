@@ -4,7 +4,7 @@ Use this for a raw 2-3 minute TinyFish hackathon recording.
 
 ## Goal
 
-Show that AuthPilot AI uses TinyFish live on real payer web pages to answer two operator questions:
+Show that Clinic Ops Agent uses TinyFish live on real payer web pages to answer two operator questions:
 
 1. Is this chart ready for submission?
 2. What is the correct payer precertification route?
@@ -20,7 +20,7 @@ Show that AuthPilot AI uses TinyFish live on real payer web pages to answer two 
 
 1. Open with the pain
 
-Say: "Clinic staff still read payer policy pages by hand and then search for the right prior-auth channel. AuthPilot AI automates both steps."
+Say: "Clinic staff still read payer policy pages by hand and then search for the right prior-auth channel. Clinic Ops Agent automates both steps."
 
 2. Explain why TinyFish is required
 
@@ -56,4 +56,4 @@ Say: "Instead of making staff manually read policy language and search the payer
 
 End on the operator handoff packet and say:
 
-"AuthPilot AI turns messy payer website research into a live clinical ops handoff."
+"Clinic Ops Agent turns messy payer website research into a live clinical ops handoff."

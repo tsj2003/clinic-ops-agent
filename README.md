@@ -1,6 +1,6 @@
-# AuthPilot AI
+# Clinic Ops Agent
 
-AuthPilot AI is a live payer-policy intelligence and action-routing agent for clinics.
+Clinic Ops Agent is a live payer-policy intelligence and action-routing agent for clinics.
 
 It uses the TinyFish Web Agent API to visit a real insurer policy page, extract documentation requirements, compare them against a synthetic patient chart, and then look up the right prior-authorization contact path on the payer site before a staff member spends time in the portal.
 

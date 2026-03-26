@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'AuthPilot AI',
+  title: 'Clinic Ops Agent',
   description: 'Autonomous agent for insurance authorization',
 };
 

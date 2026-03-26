@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: authpilot-ai
+    name: clinic-ops-agent
     runtime: docker
     repo: https://github.com/tsj2003/clinic-ops-agent
     branch: main

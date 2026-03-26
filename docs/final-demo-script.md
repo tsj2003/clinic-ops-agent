@@ -14,7 +14,7 @@ Use this version for the raw 2-3 minute hackathon recording.
 
 Say:
 
-"Prior authorization teams lose time before they ever touch a payer portal. Staff manually read policy pages, compare those rules against the chart, and then search insurer sites for the correct precertification route. AuthPilot AI automates that browser-heavy prep work."
+"Prior authorization teams lose time before they ever touch a payer portal. Staff manually read policy pages, compare those rules against the chart, and then search insurer sites for the correct precertification route. Clinic Ops Agent automates that browser-heavy prep work."
 
 Pause for a beat and let the app start.
 
@@ -50,11 +50,11 @@ When the operator packet is visible:
 
 Say:
 
-"The output is an operator handoff packet. Instead of asking staff to read policy language and search the payer site themselves, AuthPilot AI returns a submission-readiness decision and the next payer action to take."
+"The output is an operator handoff packet. Instead of asking staff to read policy language and search the payer site themselves, Clinic Ops Agent returns a submission-readiness decision and the next payer action to take."
 
 Close with:
 
-"AuthPilot AI turns prior authorization from a brittle manual research task into an adaptive clinic-ops workflow powered by live browser agents."
+"Clinic Ops Agent turns prior authorization from a brittle manual research task into an adaptive clinic-ops workflow powered by live browser agents."
 
 ## Backup Line If Asked Whether It Is Really Live
 
