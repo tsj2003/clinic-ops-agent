@@ -48,7 +48,7 @@ jobs:
         run: npm ci
 
       - name: Run web test suite
-        run: npm test -- --runInBand
+        run: npm test
 
   reliability-gate:
     name: TestSprite Reliability Gate
