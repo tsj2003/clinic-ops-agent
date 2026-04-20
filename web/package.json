@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "node scripts/validate-production-secrets.mjs && next start",
-    "test": "node --test \"tests/**/*.test.mjs\"",
+    "test": "node scripts/run-tests.mjs",
     "audit:production": "node scripts/production-stress-audit.mjs",
     "test:reliability": "node scripts/run-testsprite-reliability-gate.mjs",
     "test:regression:portal": "node tests/regression/portal-testsprite.js",
