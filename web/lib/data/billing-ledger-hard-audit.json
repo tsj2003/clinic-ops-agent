@@ -1,0 +1,31 @@
+{
+  "charges": [
+    {
+      "id": "charge-hard-1",
+      "runId": "run-hard-audit-1",
+      "practiceId": "practice-hard-audit",
+      "procedureCode": "72148",
+      "insuranceType": "COMMERCIAL",
+      "payerReferenceId": "PAYER-REF-HARD-001",
+      "idempotencyKey": "PAYER-REF-HARD-001",
+      "chargeAmountUsd": 50,
+      "procedureValueUsd": 1500,
+      "status": "pending",
+      "source": "automation",
+      "createdAt": "2026-04-17T07:38:43.463Z",
+      "refundedAt": ""
+    }
+  ],
+  "refunds": [],
+  "events": [
+    {
+      "type": "revenue_locked",
+      "runId": "run-hard-audit-1",
+      "practiceId": "practice-hard-audit",
+      "payerReferenceId": "PAYER-REF-HARD-001",
+      "amountUsd": 50,
+      "procedureValueUsd": 1500,
+      "timestamp": "2026-04-17T07:38:43.463Z"
+    }
+  ]
+}

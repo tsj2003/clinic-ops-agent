@@ -1,0 +1,136 @@
+name: Nightly Tests
+
+on:
+  schedule:
+    # Run at 2 AM UTC every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Manual trigger
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ============================================
+  # Full Test Suite
+  # ============================================
+  full-test:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run full test suite
+        env:
+          MONGODB_URI: mongodb://localhost:27017/test
+          REDIS_URL: redis://localhost:6379/0
+          FIREWORKS_API_KEY: test-key
+          MIXEDBREAD_API_KEY: test-key
+          TINYFISH_API_KEY: test-key
+        run: |
+          pytest tests/ -v --tb=long --durations=10
+
+  # ============================================
+  # Security Scan
+  # ============================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit[toml] safety detect-secrets pip-audit
+
+      - name: Run security audit
+        run: |
+          python scripts/security_audit.py
+
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-security-report
+          path: security_audit_report.txt
+
+  # ============================================
+  # Dependency Update Check
+  # ============================================
+  dependency-check:
+    name: Dependency Update Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check for updates
+        run: |
+          pip install pip-outdated
+          pip-outdated requirements.txt || true
+
+  # ============================================
+  # Performance Regression Test
+  # ============================================
+  performance-test:
+    name: Performance Regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Start API server
+        env:
+          MONGODB_URI: mongodb://localhost:27017/test
+          FIREWORKS_API_KEY: test-key
+        run: |
+          uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+
+      - name: Run load test (small)
+        run: |
+          cd tests/load
+          locust -f locustfile.py --host http://localhost:8000 \
+            --users 100 --spawn-rate 10 --run-time 2m \
+            --headless --csv results/nightly_load_test
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-performance-results
+          path: tests/load/results/

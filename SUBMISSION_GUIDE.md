@@ -9,14 +9,21 @@
 
 ## What This Project Does (30 Seconds)
 
-Clinic Ops Agent automates the 2-hour prior authorization research process into 80 seconds using **live browser automation** via TinyFish.
+Clinic Ops Agent closes an operations **growth gap** in specialty clinics: case volume rises, but staff capacity and payer expertise do not. Prior-auth prep becomes the bottleneck.
+
+This project applies **Inbound Open Innovation** to a mature, regulated industry: instead of relying on non-existent payer APIs or brittle scrapers, it uses **live browser automation** (TinyFish) to extract policy truth and routing directly from real payer websites, then integrates that data into an ops-owned operator handoff.
+
+**Hard KPI proof (demo-ready):**
+- Manual prior-auth prep research: ~120 minutes
+- This workflow: ~80 seconds
+- **Time saved per case: ~118.7 minutes** (\(~98.9\% reduction\))
 
 **Two-stage live workflow:**
 1. Opens real Aetna policy page → extracts MRI requirements
 2. Opens Aetna contact page → finds precertification phone numbers
 3. Returns operator-ready decision + next steps
 
-**Key differentiator**: Not a chatbot. Not mock data. Real browser agents on real insurance websites.
+**Key differentiator**: Not a chatbot. Not mock data. Real browser agents on real insurance websites + an operator packet designed for revenue-cycle staff.
 
 ---
 
@@ -33,7 +40,8 @@ Clinic Ops Agent automates the 2-hour prior authorization research process into 
 - ✅ Real TinyFish run IDs (proof of live execution)
 - ✅ Live Aetna page extraction results
 - ✅ Submission readiness verdict
-- ✅ Exact phone number to call
+- ✅ Routing + fallback (phone / portal path) when available
+- ✅ Evidence-gap detection *before submission* (denial-risk prevention)
 
 ### Option 2: Run Locally
 
@@ -93,6 +101,13 @@ tinyfish_client.py → Aetna.com (live browser)
 - `stream_runner.py` - Main workflow orchestration
 - `agent/tinyfish_client.py` - TinyFish API integration
 - `core/reasoning.py` - Chart analysis engine
+
+## Business-owned integration (why this is more than a demo)
+
+Open Innovation works when the business owns outcomes. The output here is structured for ops teams:
+- Operator packet is exportable (JSON/TXT/CSV)
+- Runs are saved and diffs surface payer changes over time
+- Custom mode supports reusable clinic workspaces and case bundles
 
 ---
 

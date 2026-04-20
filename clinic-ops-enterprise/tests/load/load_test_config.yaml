@@ -1,0 +1,37 @@
+# Load Test Configuration
+# Run with: locust -f tests/load/locustfile.py --config tests/load/load_test_config.yaml
+
+# Target host
+host: http://localhost:8000
+
+# Load shape configuration
+users: 1000
+spawn-rate: 50  # Users per second
+run-time: 10m  # Test duration
+
+# Web UI (disable for headless)
+headless: true
+
+# Output
+csv: tests/load/results/clinic_ops_load_test
+html: tests/load/results/report.html
+
+# Logging
+loglevel: INFO
+
+# Expected performance thresholds
+# These are validated after the test
+thresholds:
+  # Response time thresholds (ms)
+  p50_response_time: 200  # 50th percentile
+  p95_response_time: 1000  # 95th percentile
+  p99_response_time: 2000  # 99th percentile
+  
+  # Error rate threshold (%)
+  error_rate: 1.0
+  
+  # Throughput (RPS)
+  min_rps: 100
+  
+  # Availability (%)
+  availability: 99.9

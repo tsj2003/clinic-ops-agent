@@ -1,0 +1,921 @@
+openapi: 3.0.0
+info:
+  title: Clinic Ops Agent Enterprise API
+  description: |
+    Enterprise-grade Revenue Cycle Management (RCM) API with AI-powered automation.
+    
+    Features:
+    - Prior authorization workflows
+    - Claims denial management
+    - Real-time EHR integration
+    - AI-powered clinical analysis
+    - HIPAA-compliant audit logging
+    - Multi-tenant white-label support
+    
+    **Authentication**: Bearer token required for all endpoints.
+    
+    **Rate Limits**: 
+    - Starter: 1000 req/hour
+    - Professional: 5000 req/hour  
+    - Enterprise: 25000 req/hour
+    - Unlimited: 100000 req/hour
+  version: 2.0.0
+  contact:
+    name: Clinic Ops Support
+    email: api-support@clinic-ops.ai
+  license:
+    name: Enterprise License
+    url: https://clinic-ops.ai/license
+
+servers:
+  - url: https://api.clinic-ops.ai/v2
+    description: Production
+  - url: https://api-staging.clinic-ops.ai/v2
+    description: Staging
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Check API availability and service status
+      security: []  # Public endpoint
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                version: 2.0.0
+                timestamp: "2024-01-15T10:30:00Z"
+                services:
+                  database: connected
+                  ai_engine: operational
+                  ehr_integration: operational
+
+  /claims:
+    post:
+      summary: Submit Claim
+      description: Submit a new prior authorization or claim for processing
+      tags:
+        - Claims
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmission'
+      responses:
+        '201':
+          description: Claim created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+    get:
+      summary: List Claims
+      description: Retrieve paginated list of claims
+      tags:
+        - Claims
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, submitted, approved, denied, appealed, paid]
+        - name: payer_id
+          in: query
+          schema:
+            type: string
+        - name: patient_id
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of claims
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimListResponse'
+
+  /claims/{claim_id}:
+    get:
+      summary: Get Claim Details
+      description: Retrieve detailed information about a specific claim
+      tags:
+        - Claims
+      parameters:
+        - name: claim_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Claim details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimDetailResponse'
+        '404':
+          description: Claim not found
+
+  /claims/{claim_id}/analyze:
+    post:
+      summary: Analyze Claim (Pre-Submission)
+      description: AI-powered analysis of claim before submission
+      tags:
+        - AI Analysis
+      parameters:
+        - name: claim_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                include_nlp_analysis:
+                  type: boolean
+                  default: true
+                check_historical_patterns:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimAnalysisResponse'
+
+  /claims/{claim_id}/submit:
+    post:
+      summary: Submit Claim to Payer
+      description: Submit claim to insurance payer portal
+      tags:
+        - Claims
+      parameters:
+        - name: claim_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Submission initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submission_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [submitted, pending, error]
+                  payer_portal:
+                    type: string
+                  tracking_number:
+                    type: string
+                  submitted_at:
+                    type: string
+                    format: date-time
+
+  /denials:
+    get:
+      summary: List Denials
+      description: Get all denied claims requiring appeal
+      tags:
+        - Denials
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, analyzing, appeal_ready, submitted, resolved]
+        - name: urgency
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+      responses:
+        '200':
+          description: List of denials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DenialListResponse'
+
+    post:
+      summary: Create Denial Record
+      description: Manually add a new denial for tracking
+      tags:
+        - Denials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DenialCreateRequest'
+      responses:
+        '201':
+          description: Denial record created
+
+  /denials/{denial_id}/analyze:
+    post:
+      summary: AI Analysis of Denial
+      description: Analyze denial reason and generate appeal strategy
+      tags:
+        - Denials
+        - AI Analysis
+      parameters:
+        - name: denial_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DenialAnalysisResponse'
+
+  /denials/{denial_id}/appeal:
+    post:
+      summary: Generate & Submit Appeal
+      description: Generate appeal letter and submit to payer
+      tags:
+        - Denials
+      parameters:
+        - name: denial_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                submit_immediately:
+                  type: boolean
+                  default: false
+                appeal_method:
+                  type: string
+                  enum: [online, fax, mail, phone]
+                additional_notes:
+                  type: string
+      responses:
+        '200':
+          description: Appeal generated/submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppealResponse'
+
+  /ehr/patients:
+    get:
+      summary: Search Patients
+      description: Search EHR for patients (Epic, Cerner, athenahealth)
+      tags:
+        - EHR Integration
+      parameters:
+        - name: mrn
+          in: query
+          schema:
+            type: string
+          description: Medical Record Number
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: dob
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Patient search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientSearchResponse'
+
+  /ehr/patients/{patient_id}/records:
+    get:
+      summary: Get Patient Records
+      description: Retrieve comprehensive patient records from EHR
+      tags:
+        - EHR Integration
+      parameters:
+        - name: patient_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: include_clinical
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - name: include_insurance
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Patient records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRecordsResponse'
+
+  /analytics/dashboard:
+    get:
+      summary: Dashboard Metrics
+      description: Get real-time dashboard analytics
+      tags:
+        - Analytics
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+
+  /analytics/payer-behavior:
+    get:
+      summary: Payer Behavior Analytics
+      description: Get aggregated payer behavior data
+      tags:
+        - Analytics
+      parameters:
+        - name: payer_id
+          in: query
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, 1y]
+            default: 30d
+      responses:
+        '200':
+          description: Payer behavior data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayerBehaviorResponse'
+
+  /contracts/analyze:
+    post:
+      summary: Analyze Payer Contract
+      description: AI extraction of contract terms and rates
+      tags:
+        - Contract Management
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                contract_document:
+                  type: string
+                  format: binary
+                payer_id:
+                  type: string
+      responses:
+        '200':
+          description: Contract analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractAnalysisResponse'
+
+  /underpayments:
+    get:
+      summary: List Underpayments
+      description: Get detected underpayments requiring recovery
+      tags:
+        - Underpayment Recovery
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, recovery_initiated, resolved]
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+      responses:
+        '200':
+          description: List of underpayments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnderpaymentListResponse'
+
+  /underpayments/{flag_id}/recover:
+    post:
+      summary: Initiate Recovery
+      description: Start recovery process for underpayment
+      tags:
+        - Underpayment Recovery
+      parameters:
+        - name: flag_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum: [auto, manual]
+                  default: auto
+      responses:
+        '200':
+          description: Recovery initiated
+
+  /negotiate/initiate:
+    post:
+      summary: Initiate AI-to-AI Negotiation
+      description: Start autonomous negotiation with payer AI
+      tags:
+        - AI Negotiation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NegotiationInitiateRequest'
+      responses:
+        '201':
+          description: Negotiation session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NegotiationSessionResponse'
+
+  /audit/logs:
+    get:
+      summary: Audit Trail
+      description: Retrieve HIPAA-compliant audit logs
+      tags:
+        - Compliance
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: operation
+          in: query
+          schema:
+            type: string
+            enum: [create, read, update, delete, submit, query]
+        - name: user_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: API key from your Clinic Ops dashboard
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+
+    ClaimSubmission:
+      type: object
+      required:
+        - patient_id
+        - procedure_code
+        - provider_npi
+        - payer_id
+      properties:
+        patient_id:
+          type: string
+        procedure_code:
+          type: string
+          description: CPT/HCPCS code
+        diagnosis_codes:
+          type: array
+          items:
+            type: string
+          description: ICD-10 codes
+        provider_npi:
+          type: string
+        payer_id:
+          type: string
+        place_of_service:
+          type: string
+        clinical_notes:
+          type: string
+        estimated_amount:
+          type: number
+
+    ClaimResponse:
+      type: object
+      properties:
+        claim_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        ai_analysis:
+          type: object
+
+    ClaimListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        claims:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClaimResponse'
+
+    ClaimDetailResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ClaimResponse'
+        - type: object
+          properties:
+            patient_info:
+              type: object
+            submission_history:
+              type: array
+            denial_history:
+              type: array
+
+    ClaimAnalysisResponse:
+      type: object
+      properties:
+        claim_id:
+          type: string
+        submission_readiness:
+          type: string
+          enum: [can_submit, needs_review, blocked]
+        risk_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        issues_found:
+          type: array
+        recommendations:
+          type: array
+        auto_fixes_applied:
+          type: array
+
+    DenialListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        denials:
+          type: array
+          items:
+            type: object
+            properties:
+              denial_id:
+                type: string
+              claim_id:
+                type: string
+              payer_id:
+                type: string
+              denial_code:
+                type: string
+              denial_reason:
+                type: string
+              deadline_date:
+                type: string
+                format: date
+              status:
+                type: string
+
+    DenialCreateRequest:
+      type: object
+      required:
+        - claim_id
+        - denial_code
+        - denial_reason
+      properties:
+        claim_id:
+          type: string
+        denial_code:
+          type: string
+          description: CARC/RARC code
+        denial_reason:
+          type: string
+        payer_response:
+          type: string
+
+    DenialAnalysisResponse:
+      type: object
+      properties:
+        denial_id:
+          type: string
+        category:
+          type: string
+        ai_analysis:
+          type: string
+        appeal_probability:
+          type: number
+        recommended_strategy:
+          type: string
+        deadline:
+          type: string
+          format: date
+        supporting_documents:
+          type: array
+          items:
+            type: string
+
+    AppealResponse:
+      type: object
+      properties:
+        appeal_id:
+          type: string
+        status:
+          type: string
+          enum: [generated, submitted, confirmed]
+        confirmation_number:
+          type: string
+        appeal_letter:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+
+    PatientSearchResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        patients:
+          type: array
+          items:
+            type: object
+            properties:
+              patient_id:
+                type: string
+              mrn:
+                type: string
+              name:
+                type: string
+              dob:
+                type: string
+                format: date
+              insurance:
+                type: object
+
+    PatientRecordsResponse:
+      type: object
+      properties:
+        patient_id:
+          type: string
+        demographics:
+          type: object
+        encounters:
+          type: array
+        insurance:
+          type: object
+        authorizations:
+          type: array
+
+    DashboardResponse:
+      type: object
+      properties:
+        summary:
+          type: object
+          properties:
+            total_claims:
+              type: integer
+            pending_auth:
+              type: integer
+            denied_claims:
+              type: integer
+            recovered_amount:
+              type: number
+        trends:
+          type: object
+        top_payers:
+          type: array
+        recent_activity:
+          type: array
+
+    PayerBehaviorResponse:
+      type: object
+      properties:
+        payer_id:
+          type: string
+        payer_name:
+          type: string
+        metrics:
+          type: object
+          properties:
+            approval_rate:
+              type: number
+            denial_rate:
+              type: number
+            avg_processing_days:
+              type: number
+        trends:
+          type: object
+        contract_leverage_score:
+          type: number
+
+    ContractAnalysisResponse:
+      type: object
+      properties:
+        contract_id:
+          type: string
+        payer_id:
+          type: string
+        terms_extracted:
+          type: integer
+        rate_schedule:
+          type: array
+        timely_filing_days:
+          type: integer
+        bundling_rules:
+          type: array
+        confidence:
+          type: number
+
+    UnderpaymentListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        total_value:
+          type: number
+        underpayments:
+          type: array
+          items:
+            type: object
+            properties:
+              flag_id:
+                type: string
+              claim_id:
+                type: string
+              expected_amount:
+                type: number
+              actual_amount:
+                type: number
+              underpayment_amount:
+                type: number
+              severity:
+                type: string
+
+    NegotiationInitiateRequest:
+      type: object
+      required:
+        - claim_id
+        - denial_reason
+      properties:
+        claim_id:
+          type: string
+        denial_reason:
+          type: string
+        procedure_code:
+          type: string
+        diagnosis_codes:
+          type: array
+          items:
+            type: string
+        clinical_notes:
+          type: string
+
+    NegotiationSessionResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        claim_id:
+          type: string
+        status:
+          type: string
+        rounds:
+          type: integer
+        outcome:
+          type: string
+        confidence:
+          type: number
+
+    AuditLogResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        logs:
+          type: array
+          items:
+            type: object
+            properties:
+              log_id:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              operation:
+                type: string
+              user_id:
+                type: string
+              resource_id:
+                type: string
+              success:
+                type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+
+  parameters:
+    TenantId:
+      name: X-Tenant-ID
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Required for white-label BPO deployments

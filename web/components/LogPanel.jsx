@@ -1,15 +1,15 @@
 export default function LogPanel({ title, logs, isRunning }) {
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-slate-700 bg-slate-900/75 p-4 shadow-soft">
+    <div className="glass-panel flex h-full flex-col rounded-2xl p-4">
       <h3 className="mb-3 text-lg font-semibold text-slate-100">{title}</h3>
-      <div className="scrollbar-thin log-mono flex-1 space-y-2 overflow-y-auto rounded-xl bg-slate-950/80 p-3 text-sm">
+      <div className="glass-subpanel scrollbar-thin log-mono flex-1 space-y-2 overflow-y-auto rounded-xl p-3 text-sm">
         {logs.length === 0 ? (
           <p className="text-slate-500">🧠 Ready to analyze clinical input...</p>
         ) : (
           logs.map((log) => (
             <div
               key={log.id}
-              className={`animate-fadeIn rounded-lg border px-3 py-2 ${
+              className={`motion-log-entry rounded-lg border px-3 py-2 ${
                 log.level === 'error'
                   ? 'border-red-500/40 bg-red-500/10 text-red-200 shadow-[0_0_20px_rgba(239,68,68,0.15)]'
                   : log.level === 'retry'

@@ -1,0 +1,317 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================
+  # Code Quality & Linting
+  # ============================================
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Black (format check)
+        run: black --check . || true
+
+      - name: Run Ruff (linting)
+        run: ruff check . || true
+
+      - name: Run MyPy (type checking)
+        run: mypy . --ignore-missing-imports || true
+
+  # ============================================
+  # Security Scanning
+  # ============================================
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit[toml] safety detect-secrets pip-audit
+
+      - name: Run Bandit (static analysis)
+        run: |
+          bandit -r . -f json -o bandit-report.json || true
+          bandit -r . || true
+
+      - name: Run Safety (dependency check)
+        run: safety check || true
+
+      - name: Run Pip-Audit
+        run: pip-audit -r requirements.txt || true
+
+      - name: Detect Secrets
+        run: |
+          detect-secrets scan > .secrets.baseline
+          detect-secrets audit .secrets.baseline || true
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: bandit-report.json
+
+  # ============================================
+  # Unit & Integration Tests
+  # ============================================
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        env:
+          MONGODB_URI: mongodb://localhost:27017/test
+          REDIS_URL: redis://localhost:6379/0
+          FIREWORKS_API_KEY: test-key
+          MIXEDBREAD_API_KEY: test-key
+          TINYFISH_API_KEY: test-key
+          API_SECRET_KEY: test-secret-key-min-32-chars-long
+          FERNET_KEY: 32-byte-key-for-testing-only-do-not-use
+        run: |
+          pytest tests/ -v --cov=. --cov-report=xml --cov-report=html --tb=short
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: htmlcov/
+
+  # ============================================
+  # Build Docker Image
+  # ============================================
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [lint, security, test]
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ============================================
+  # Deploy to Staging
+  # ============================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name clinic-ops-staging
+
+      - name: Deploy to EKS
+        run: |
+          # Update image tag in deployment
+          IMAGE_TAG=ghcr.io/${{ github.repository }}:${{ github.sha }}
+          sed -i "s|image: clinic-ops-enterprise:latest|image: $IMAGE_TAG|" k8s/deployment.yaml
+          
+          # Apply Kubernetes manifests
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/hpa.yaml
+          
+          # Wait for rollout
+          kubectl rollout status deployment/clinic-ops-api -n clinic-ops --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n clinic-ops
+          kubectl get svc -n clinic-ops
+
+  # ============================================
+  # Deploy to Production
+  # ============================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name clinic-ops-production
+
+      - name: Deploy to EKS (Canary)
+        run: |
+          IMAGE_TAG=ghcr.io/${{ github.repository }}:${{ github.sha }}
+          
+          # Canary deployment - deploy 20% of traffic first
+          kubectl set image deployment/clinic-ops-api \
+            api=$IMAGE_TAG \
+            -n clinic-ops --record
+          
+          # Wait for rollout
+          kubectl rollout status deployment/clinic-ops-api \
+            -n clinic-ops --timeout=600s
+
+      - name: Health check
+        run: |
+          # Wait for pods to be ready
+          sleep 30
+          
+          # Run health checks
+          kubectl run health-check --rm -i --restart=Never \
+            --image=curlimages/curl:latest \
+            -- curl -f http://clinic-ops-api/clinic-ops/health
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Production deployment ${{ job.status }}: ${{ github.repository }}@${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

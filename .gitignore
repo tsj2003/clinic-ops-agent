@@ -10,7 +10,15 @@ web/node_modules/
 web/.next/
 web/.next-dev/
 web/.next.bak.*/
+.data/
 
 .vercel/
 .idea/
 .vscode/
+
+venv/
+.venv/
+*.zip
+web/.next.log
+web/.next-*/
+commitment-records.json

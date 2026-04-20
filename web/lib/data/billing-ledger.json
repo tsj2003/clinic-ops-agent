@@ -1,0 +1,75 @@
+{
+  "charges": [
+    {
+      "id": "charge-3003",
+      "runId": "run-billing-3",
+      "practiceId": "practice-303",
+      "procedureCode": "62323",
+      "insuranceType": "MEDICARE ADVANTAGE",
+      "payerReferenceId": "PAYER-REF-3003",
+      "idempotencyKey": "PAYER-REF-3003",
+      "chargeAmountUsd": 50,
+      "procedureValueUsd": 950,
+      "status": "refunded",
+      "source": "automation",
+      "createdAt": "2026-04-16T20:16:35.529Z",
+      "refundedAt": "2026-04-16T20:16:35.532Z"
+    },
+    {
+      "id": "hard-charge-1",
+      "runId": "hard-check-billing-1",
+      "practiceId": "practice-hard-audit",
+      "procedureCode": "72148",
+      "insuranceType": "COMMERCIAL",
+      "payerReferenceId": "PAYER-REF-HARDCHECK-1",
+      "idempotencyKey": "PAYER-REF-HARDCHECK-1",
+      "chargeAmountUsd": 50,
+      "procedureValueUsd": 1500,
+      "status": "pending",
+      "source": "automation",
+      "createdAt": "2026-04-16T20:18:18.245Z",
+      "refundedAt": ""
+    }
+  ],
+  "refunds": [
+    {
+      "id": "refund-3003",
+      "chargeId": "charge-3003",
+      "runId": "run-billing-3",
+      "practiceId": "practice-303",
+      "amountUsd": 50,
+      "reason": "approval_inaccurate",
+      "actor": "clinician",
+      "status": "succeeded",
+      "idempotencyKey": "refund:charge-3003:run-billing-3",
+      "createdAt": "2026-04-16T20:16:35.532Z"
+    }
+  ],
+  "events": [
+    {
+      "type": "revenue_locked",
+      "runId": "run-billing-3",
+      "practiceId": "practice-303",
+      "payerReferenceId": "PAYER-REF-3003",
+      "amountUsd": 50,
+      "procedureValueUsd": 950,
+      "timestamp": "2026-04-16T20:16:35.529Z"
+    },
+    {
+      "type": "refund_issued",
+      "runId": "run-billing-3",
+      "practiceId": "practice-303",
+      "amountUsd": 50,
+      "timestamp": "2026-04-16T20:16:35.532Z"
+    },
+    {
+      "type": "revenue_locked",
+      "runId": "hard-check-billing-1",
+      "practiceId": "practice-hard-audit",
+      "payerReferenceId": "PAYER-REF-HARDCHECK-1",
+      "amountUsd": 50,
+      "procedureValueUsd": 1500,
+      "timestamp": "2026-04-16T20:18:18.245Z"
+    }
+  ]
+}

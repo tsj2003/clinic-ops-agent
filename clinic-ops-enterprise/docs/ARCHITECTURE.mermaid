@@ -1,0 +1,156 @@
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        UI[Dashboard UI<br/>Next.js/React]
+        API_CLIENT[API Clients<br/>Python/Node SDKs]
+        BPO[White-Label Tenants<br/>Multi-Tenant BPOs]
+    end
+
+    subgraph "API Gateway"
+        GW[FastAPI Gateway<br/>JWT Auth]
+        RATE[Rate Limiter<br/>Tier-based]
+        VALID[Validation Layer]
+    end
+
+    subgraph "Core Services"
+        CLAIMS[Claims Service]
+        DENIALS[Denial Management]
+        ANALYTICS[Analytics & ROI]
+        EHR[EHR Integration]
+    end
+
+    subgraph "AI Orchestration Layer"
+        ORCH[AG2 Orchestrator]
+        RAG[Agentic RAG<br/>4 Concurrent Agents]
+        PRE[Pre-Submission Engine<br/>⭐ NLP Analysis]
+        NEG[AI-to-AI Negotiation<br/>Multi-round]
+        UNDER[Underpayment Recovery<br/>Contract AI]
+    end
+
+    subgraph "External Integrations"
+        TINYFISH[TinyFish API<br/>Portal Automation]
+        FIREWORKS[Fireworks AI<br/>LLM Analysis]
+        MIXEDBREAD[Mixedbread<br/>RAG Embeddings]
+        EPIC[Epic FHIR<br/>OAuth2]
+        CERNER[Cerner<br/>FHIR R4]
+        ATHENA[athenahealth<br/>API]
+        PBM[Pharmacy/PBM<br/>Formulary]
+    end
+
+    subgraph "Data Layer"
+        MONGO[(MongoDB Atlas<br/>Claims & Config)]
+        REDIS[(Redis<br/>Session Cache)]
+        MINIO[(MinIO/S3<br/>Documents)]
+    end
+
+    subgraph "Security & Compliance"
+        ABAC[ABAC Engine<br/>6+ Roles]
+        AUDIT[Audit Logger<br/>SHA-256 Chains]
+        STEALTH[Stealth Engine<br/>Browser Hardening]
+        HIPAA[HIPAA Compliance<br/>BAA Support]
+    end
+
+    subgraph "Observability"
+        AX[Axiom<br/>Audit Logs]
+        AGENTOPS[AgentOps<br/>Agent Monitoring]
+        PROM[Prometheus<br/>Metrics]
+    end
+
+    UI --> GW
+    API_CLIENT --> GW
+    BPO --> GW
+
+    GW --> RATE
+    RATE --> VALID
+    VALID --> CLAIMS
+    VALID --> DENIALS
+    VALID --> ANALYTICS
+    VALID --> EHR
+
+    CLAIMS --> ORCH
+    DENIALS --> ORCH
+    EHR --> ORCH
+
+    ORCH --> RAG
+    ORCH --> PRE
+    ORCH --> NEG
+    ORCH --> UNDER
+
+    RAG --> FIREWORKS
+    RAG --> MIXEDBREAD
+    PRE --> FIREWORKS
+    NEG --> FIREWORKS
+    UNDER --> FIREWORKS
+
+    ORCH --> TINYFISH
+    ORCH --> PBM
+    
+    EHR --> EPIC
+    EHR --> CERNER
+    EHR --> ATHENA
+
+    CLAIMS --> MONGO
+    DENIALS --> MONGO
+    ANALYTICS --> MONGO
+    EHR --> MONGO
+
+    ORCH --> REDIS
+    ORCH --> MINIO
+
+    GW --> ABAC
+    ABAC --> AUDIT
+    AUDIT --> HIPAA
+    HIPAA --> AX
+
+    TINYFISH --> STEALTH
+    STEALTH --> ORCH
+
+    ORCH --> AGENTOPS
+    GW --> PROM
+
+    classDef highlight fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef service fill:#bbf,stroke:#333,stroke-width:1px;
+    classDef data fill:#bfb,stroke:#333,stroke-width:1px;
+    classDef security fill:#fbb,stroke:#333,stroke-width:1px;
+    classDef external fill:#fbf,stroke:#333,stroke-width:1px;
+
+    class PRE,NEG,UNDER,RAG highlight;
+    class CLAIMS,DENIALS,ANALYTICS,EHR,ORCH service;
+    class MONGO,REDIS,MINIO data;
+    class ABAC,AUDIT,STEALTH,HIPAA security;
+    class TINYFISH,FIREWORKS,MIXEDBREAD,EPIC,CERNER,ATHENA,PBM external;
+```
+
+---
+
+## Feature 14: Pre-Submission Engine (Highest ROI)
+- Real-time NLP analysis before claim submission
+- 92% denial prediction accuracy
+- Auto-fixes for modifiers, place of service
+- Risk scoring 0-1 scale
+
+## Feature 17: AI-to-AI Negotiation
+- Autonomous clinical evidence presentation
+- Multi-round debate with payer AI
+- Clinical guardrails for safety
+- Resolution tracking
+
+## Feature 16: Underpayment Recovery
+- Contract term AI extraction
+- ERA sweeping for underpayments
+- Auto-dispute initiation
+- Recovery queue management
+
+## Feature 12: Agentic RAG
+- 4 concurrent specialized agents
+- Multi-hop reasoning
+- Parallel execution
+- Result synthesis with confidence
+
+## Security Layer
+- ABAC with 6+ roles (billing_staff, clinical_staff, admin, auditor, ai_agent)
+- Operation-level logging (4 elements)
+- Tamper-evident SHA-256 hash chains
+- HMAC signatures
+- Browser fingerprint rotation (10 profiles)
+- Signal patching (WebGL, Canvas, Audio, TLS)

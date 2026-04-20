@@ -20,6 +20,39 @@ TINYFISH_API_BASE_URL=https://agent.tinyfish.ai
 PYTHON_BIN=python3
 ```
 
+Optional run history persistence:
+
+```bash
+MONGODB_URI=your_mongodb_connection_string
+MONGODB_DB_NAME=authpilot
+MONGODB_COLLECTION=run_history
+RUN_RETENTION_DAYS=90
+```
+
+Optional Axiom observability:
+
+```bash
+AXIOM_API_TOKEN=your_axiom_token
+AXIOM_DATASET=authpilot_runs
+AXIOM_BASE_URL=https://api.axiom.co
+```
+
+Optional write-route protection:
+
+```bash
+INTERNAL_API_KEY=your_internal_ops_key
+```
+
+When `INTERNAL_API_KEY` is set, write routes require:
+
+`x-internal-api-key: <key>`
+
+Protected write routes:
+- `PATCH /api/runs`
+- `POST /api/workspaces`
+- `DELETE /api/workspaces`
+- `POST /api/discover-sources`
+
 Optional workflow overrides:
 
 ```bash
@@ -74,6 +107,28 @@ Open `http://localhost:3000`.
 - The policy and contact runs populate with live workflow status
 - The artifact and operator packet update from the backend stream
 - No browser console errors appear during the demo
+
+## Request Tracing Verification
+
+For API calls and failures, verify:
+
+- response header includes `x-request-id`
+- JSON response includes `requestId`
+- failed runs are visible in run history with `failure.code` and `failure.stage`
+
+This improves demo reliability and buyer confidence during pilot onboarding.
+
+## Canonical Environment Variables (Deployment)
+
+Use these canonical keys in production docs and templates:
+
+- Runtime: `TINYFISH_MODE`, `TINYFISH_API_KEY`, `TINYFISH_API_BASE_URL`, `PYTHON_BIN`
+- Write auth: `INTERNAL_API_KEY`
+- Persistence: `MONGODB_URI`, `MONGODB_DB_NAME`, `MONGODB_COLLECTION`
+- Retention: `RUN_RETENTION_DAYS`
+- Observability: `AXIOM_API_TOKEN`, `AXIOM_DATASET`, `AXIOM_BASE_URL`
+
+For retention + PHI-safe logging defaults, see [docs/data-retention-policy.md](docs/data-retention-policy.md).
 
 ## Important Note
 

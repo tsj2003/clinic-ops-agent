@@ -1,63 +1,67 @@
-# Final Demo Script
+# Final Demo Script (Wedge + Pilot Close)
 
-Use this version for the raw 2-3 minute hackathon recording.
+Use this script for a tight 3-minute wedge demo targeted at specialty spine/pain clinics.
 
 ## Before You Record
 
 - Set `TINYFISH_MODE=live`
 - Confirm `TINYFISH_API_KEY` is valid
-- Open the deployed app
-- Hard refresh once
-- Leave the app on the autoplay default mode
+- Open deployed app and hard refresh once
+- Keep default autoplay mode
+- Keep Admin Metrics panel visible for ROI framing
 
-## 2-3 Minute Script
+## 3-Minute Script
+
+### 0:00-0:20 — Problem + ICP
+Say:
+
+"We are focused on one wedge: spine and pain clinics handling high-friction imaging prior authorizations. Today teams lose time manually reading payer policy pages, checking chart evidence, and hunting down the right precertification route."
+
+### 0:20-0:45 — Why this is different
+Say:
+
+"This is not a static rules engine. This run uses live TinyFish browser workflows against live payer pages, then turns that into an operator-ready action packet."
+
+Point to workflow proof panel.
 
 Say:
 
-"Prior authorization teams lose time before they ever touch a payer portal. Staff manually read policy pages, compare those rules against the chart, and then search insurer sites for the correct precertification route. Clinic Ops Agent automates that browser-heavy prep work."
+"You can see policy and contact workflows streaming live execution proof here."
 
-Pause for a beat and let the app start.
+### 0:45-1:35 — Workflow step 1 (policy readiness)
+As logs stream in, say:
+
+"Step one opens the payer policy page and extracts required evidence. We compare those requirements against the chart and produce a submission-readiness decision: what is already supported and what evidence is missing."
+
+When readiness appears, say:
+
+"This gives staff a pre-submit decision instead of trial-and-error submissions."
+
+### 1:35-2:05 — Workflow step 2 (routing)
+Say:
+
+"Step two opens the payer contact/precertification route and identifies the next operational path for staff. This removes manual website hunting and reduces process variance."
+
+### 2:05-2:35 — Operator packet + ROI
+When packet appears, say:
+
+"The output is a structured operator handoff: readiness verdict, supporting evidence, missing evidence, and the exact next payer route."
+
+Point to metrics.
 
 Say:
 
-"This is a live TinyFish-powered workflow, not a chatbot and not a static API integration. The app is using real browser infrastructure against live insurer pages."
+"Our pilot KPI set is simple: denial rate delta, days-to-auth delta, hours saved per case, and recovered revenue."
 
-As the run begins, point at the proof panel.
-
-Say:
-
-"At the top left you can see the runtime mode and workflow proof. The policy run and contact run both show live TinyFish execution state, so the demo is not just a front-end animation."
-
-As logs stream in:
-
-Say:
-
-"The first workflow opens the payer policy page and extracts the evidence requirements. We then compare those requirements against a synthetic patient chart with zero PII."
-
-When the artifact or readiness result appears:
-
-Say:
-
-"The app turns the payer page into structured operational data: policy requirements, matched evidence, missing evidence, and a clear readiness recommendation."
-
-Then move to the second workflow:
-
-Say:
-
-"The second workflow opens the payer's contact or precertification page and finds the right next route for clinic staff. That means staff no longer have to hunt around the insurer website by hand."
-
-When the operator packet is visible:
-
-Say:
-
-"The output is an operator handoff packet. Instead of asking staff to read policy language and search the payer site themselves, Clinic Ops Agent returns a submission-readiness decision and the next payer action to take."
-
+### 2:35-3:00 — Pilot close CTA
 Close with:
 
-"Clinic Ops Agent turns prior authorization from a brittle manual research task into an adaptive clinic-ops workflow powered by live browser agents."
+"We run a 14-day paid pilot for one procedure lane. Success criteria are locked upfront and reviewed weekly with your ops lead. If we hit the KPI targets, we expand from this wedge to adjacent prior-auth lanes."
 
-## Backup Line If Asked Whether It Is Really Live
+## Backup Answers
 
-Say:
+### If asked "Is this actually live?"
+"Yes. Default mode autostarts the real backend stream, and the UI shows TinyFish run proof for both workflows."
 
-"Yes. The default mode now autostarts the real backend stream, and the UI exposes TinyFish execution proof directly instead of relying on narration."
+### If asked "What do we buy first?"
+"You buy one narrow workflow lane with measurable KPI outcomes, not a broad platform rollout."

@@ -3,3 +3,8 @@ pydantic
 python-dotenv
 requests
 colorama
+
+# Security (Added 2024-04-13)
+slowapi==0.1.9
+PyJWT==2.8.0
+bleach==6.1.0

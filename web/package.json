@@ -2,15 +2,31 @@
   "name": "authpilot-web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "node scripts/validate-production-secrets.mjs && next start",
+    "test": "node --test tests/**/*.test.mjs",
+    "audit:production": "node scripts/production-stress-audit.mjs",
+    "test:reliability": "node scripts/run-testsprite-reliability-gate.mjs",
+    "test:regression:portal": "node tests/regression/portal-testsprite.js",
+    "automation:voice-coordinator": "node scripts/run-voice-coordinator.mjs",
+    "automation:policy-sentinel": "node scripts/policy-sentinel-runner.mjs",
+    "automation:emr-polling": "node scripts/run-emr-polling.mjs"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.43.0",
+    "@mixedbread-ai/sdk": "^2.2.11",
+    "agentmail": "^0.4.18",
+    "busboy": "^1.6.0",
+    "composio-core": "^0.5.39",
+    "mongodb": "^6.21.0",
     "next": "14.2.5",
+    "playwright": "^1.59.1",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "twilio": "^5.13.1"
   },
   "devDependencies": {
     "autoprefixer": "10.4.19",

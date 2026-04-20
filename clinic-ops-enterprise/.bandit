@@ -1,0 +1,5 @@
+[bandit]
+exclude_dirs = venv,.git,tests,__pycache__,.pytest_cache,htmlcov
+skips = B101,B311,B404
+severity = MEDIUM
+confidence = MEDIUM

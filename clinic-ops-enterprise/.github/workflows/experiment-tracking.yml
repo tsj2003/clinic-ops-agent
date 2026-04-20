@@ -1,0 +1,78 @@
+name: Experiment Tracking - 6 Month Pivot Framework
+
+on:
+  schedule:
+    # Run every 2 weeks (Sunday at midnight)
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      experiment_name:
+        description: 'Experiment name'
+        required: true
+      result:
+        description: 'Result (success/failure/pending)'
+        required: true
+      metric:
+        description: 'Key metric measured'
+        required: true
+
+env:
+  EXPERIMENT_LOG: docs/EXPERIMENT_LOG.md
+
+jobs:
+  track-experiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Log Experiment Result
+        run: |
+          cat >> ${{ env.EXPERIMENT_LOG }} << EOF
+          
+          ## Experiment: ${{ github.event.inputs.experiment_name }}
+          **Date:** $(date +%Y-%m-%d)
+          **Result:** ${{ github.event.inputs.result }}
+          **Metric:** ${{ github.event.inputs.metric }}
+          **Sprint:** $(python -c "import datetime; print((datetime.date.today() - datetime.date(2024,4,13)).days // 14 + 1)")
+          
+          EOF
+      
+      - name: Check Pivot Trigger
+        run: |
+          python << 'PYTHON'
+          import re
+          from datetime import datetime
+          
+          # Read experiment log
+          with open('${{ env.EXPERIMENT_LOG }}', 'r') as f:
+              content = f.read()
+          
+          # Count successes and failures
+          successes = len(re.findall(r'\*\*Result:\*\* success', content))
+          failures = len(re.findall(r'\*\*Result:\*\* failure', content))
+          total = successes + failures
+          
+          if total >= 12:  # After 6 months (12 sprints)
+              success_rate = successes / total
+              if success_rate < 0.25:  # Less than 25% success
+                  print("🚨 PIVOT TRIGGER: Success rate below 25%")
+                  print("Recommend pivoting to BPO white-label strategy")
+              else:
+                  print(f"✅ Continue current strategy (Success rate: {success_rate:.1%})")
+          else:
+              sprints_remaining = 12 - total
+              print(f"📊 Sprint {total}/12 completed. {sprints_remaining} sprints until pivot evaluation.")
+          PYTHON
+      
+      - name: Commit Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ${{ env.EXPERIMENT_LOG }}
+          git commit -m "Track experiment: ${{ github.event.inputs.experiment_name }}" || exit 0
+          git push

@@ -5,7 +5,7 @@ export default function ConfidenceMeter({ value, trendText = '', trend = 'neutra
 
   return (
     <div
-      className={`rounded-2xl border bg-slate-900/70 p-4 shadow-soft transition-all duration-500 ${
+      className={`glass-panel rounded-2xl p-4 transition-all duration-500 ${
         isDrop
           ? 'border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)]'
           : isRecovery

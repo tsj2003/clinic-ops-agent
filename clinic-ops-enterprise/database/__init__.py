@@ -1,0 +1,46 @@
+"""Database module for Clinic Ops Agent Enterprise"""
+
+from .connection import mongo_manager, get_db
+from .schema import (
+    DenialClaim,
+    ClaimStatus,
+    DenialType,
+    AppealMethod,
+    PatientInfo,
+    ProcedureInfo,
+    DenialDetails,
+    ScraperEvidence,
+    AnalysisResult,
+    AppealDraft,
+    ApprovalRecord,
+    SubmissionRecord,
+    AuditEntry,
+    Organization,
+    User,
+    PayerPortalConfig,
+    AnalyticsSummary,
+    COLLECTION_INDEXES,
+)
+
+__all__ = [
+    "mongo_manager",
+    "get_db",
+    "DenialClaim",
+    "ClaimStatus",
+    "DenialType",
+    "AppealMethod",
+    "PatientInfo",
+    "ProcedureInfo",
+    "DenialDetails",
+    "ScraperEvidence",
+    "AnalysisResult",
+    "AppealDraft",
+    "ApprovalRecord",
+    "SubmissionRecord",
+    "AuditEntry",
+    "Organization",
+    "User",
+    "PayerPortalConfig",
+    "AnalyticsSummary",
+    "COLLECTION_INDEXES",
+]

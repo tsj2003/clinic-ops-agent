@@ -1,0 +1,235 @@
+# CodeRabbit AI Code Review Configuration
+# https://coderabbit.ai
+
+language: en
+
+# Early access features
+early_access: true
+
+# Review settings
+reviews:
+  # Request changes when issues found
+  request_changes_workflow: true
+  
+  # High level summary of changes
+  high_level_summary: true
+  
+  # Poem about the changes (fun feature)
+  poem: false
+  
+  # Review status (true = comment, false = approve)
+  review_status: true
+  
+  # Walkthrough of changes
+  walkthrough: true
+  
+  # Sequence diagrams for complex logic
+  sequence_diagrams: true
+  
+  # Assess code change understanding
+  assess_code_change_understanding: true
+  
+  # Apply code change labels
+  apply_code_change_labels: true
+  
+  # auto_review:
+  #   enabled: true
+  #   auto_incremental_reviews: true
+  #   ignore_title_keywords:
+  #     - "WIP"
+  #     - "DRAFT"
+  #     - "DO NOT MERGE"
+  #   drafts: false
+  #   base_branches:
+  #     - "main"
+  #     - "develop"
+
+# Knowledge base for context-aware reviews
+knowledge_base:
+  # Learnings from previous reviews
+  learnings:
+    scope: "local"  # local, global, or auto
+  
+  # Project-specific documentation
+  docs:
+    - name: "Architecture"
+      path: "docs/ARCHITECTURE.mermaid"
+    - name: "API Specification"
+      path: "docs/API_SPECIFICATION.yaml"
+    - name: "Security Checklist"
+      path: "docs/SECURITY_CHECKLIST.md"
+    - name: "README"
+      path: "README.md"
+
+# Code generation settings
+code_generation:
+  # Allow CodeRabbit to generate code
+  enable: true
+  
+  # Include docstrings
+  docstrings: true
+  
+  # Include comments
+  comments: true
+
+# Chat settings
+chat:
+  # Auto-reply to comments
+  auto_reply: true
+
+# Path-specific instructions
+path_filters:
+  # Exclude files from review
+  exclude:
+    - "tests/**"           # Test files
+    - "htmlcov/**"         # Coverage reports
+    - "docs/**/*.md"       # Documentation
+    - "**/__pycache__/**"
+    - "venv/**"
+    - ".git/**"
+    - "*.json"             # JSON configs
+    - "*.yaml"             # YAML configs (except specific ones)
+    - "*.yml"
+  
+  # Include only specific patterns
+  include:
+    - "api/**/*.py"
+    - "agent/**/*.py"
+    - "orchestrator/**/*.py"
+    - "scrapers/**/*.py"
+    - "database/**/*.py"
+    - "compliance/**/*.py"
+    - "denial_management/**/*.py"
+    - "ehr_integration/**/*.py"
+    - "self_healing/**/*.py"
+    - "underpayment_recovery/**/*.py"
+    - "negotiation/**/*.py"
+    - "analytics/**/*.py"
+    - "platform_expansion/**/*.py"
+    - "unit_economics/**/*.py"
+    - "vertical_ai/**/*.py"
+    - "stealth/**/*.py"
+
+# Language-specific settings
+language_settings:
+  python:
+    # Enable specific tools
+    pylint:
+      enabled: false  # We use Ruff
+    
+    ruff:
+      enabled: true
+    
+    mypy:
+      enabled: true
+    
+    bandit:
+      enabled: true
+    
+    # Custom instructions
+    instructions: |
+      This is a HIPAA-compliant healthcare Revenue Cycle Management (RCM) platform.
+      
+      Critical requirements:
+      1. **Security**: All code must follow HIPAA security practices
+         - No hardcoded secrets (use environment variables)
+         - Proper input validation on all endpoints
+         - Encryption for PHI (use Fernet for data at rest)
+         - Audit logging for all operations (use compliance/audit.py)
+      
+      2. **Performance**: The system handles 1000+ concurrent users
+         - Use async/await for I/O operations
+         - Implement connection pooling (MongoDB, Redis)
+         - Cache frequently accessed data
+         - Optimize database queries
+      
+      3. **Error Handling**: Healthcare data cannot be lost
+         - Always use try-except with proper logging
+         - Implement circuit breakers for external APIs
+         - Retry logic with exponential backoff
+         - Graceful degradation
+      
+      4. **Type Safety**: Use Pydantic models for all data
+         - Validate all inputs with Pydantic
+         - Use Optional[] for nullable fields
+         - Proper type hints throughout
+      
+      5. **Testing**: Maintain 90%+ test coverage
+         - Write tests for all new features
+         - Use pytest-asyncio for async tests
+         - Mock external API calls
+         - Test error conditions
+      
+      6. **Documentation**: Document all public functions
+         - Use Google-style docstrings
+         - Include type information
+         - Document exceptions raised
+         - Add examples for complex functions
+
+# Tools integration
+tools:
+  # Static analysis
+  static_analysis:
+    enabled: true
+  
+  # Dependency check
+  dependency_check:
+    enabled: true
+  
+  # Secret detection
+  secret_detection:
+    enabled: true
+  
+  # Code quality metrics
+  code_quality:
+    enabled: true
+    metrics:
+      - complexity
+      - duplication
+      - coverage
+
+# Review instructions
+instructions: |
+  ## Clinic Ops Agent - Code Review Guidelines
+  
+  ### Architecture Context
+  This is an AI-powered Revenue Cycle Management (RCM) platform with 20 enterprise features:
+  - Prior authorization and denial management
+  - AI-to-AI payer negotiation
+  - Underpayment recovery
+  - White-label multi-tenant platform
+  - Pharmacy/DME automation
+  
+  ### Key Architectural Patterns
+  - **FastAPI** for REST API
+  - **AG2** for multi-agent orchestration
+  - **MongoDB** for data persistence
+  - **Redis** for caching
+  - **Fireworks AI** for LLM processing
+  - **TinyFish** for web automation
+  
+  ### Review Priorities (in order)
+  1. **Security & HIPAA Compliance** - Must be bulletproof
+  2. **Data Integrity** - No data loss, proper validation
+  3. **Performance** - Async, pooling, caching
+  4. **Error Handling** - Graceful failures, proper logging
+  5. **Code Quality** - Clean, maintainable, tested
+  
+  ### Common Issues to Flag
+  - ❌ Synchronous I/O in async functions
+  - ❌ Missing input validation
+  - ❌ Hardcoded secrets or URLs
+  - ❌ No error handling for external APIs
+  - ❌ Missing audit logging for PHI operations
+  - ❌ Database queries without indexes
+  - ❌ Memory leaks (unclosed connections)
+  - ❌ Missing type hints
+  
+  ### Patterns to Encourage
+  - ✅ Use `async def` for all I/O operations
+  - ✅ Pydantic models for all inputs/outputs
+  - ✅ Proper exception hierarchy
+  - ✅ Circuit breakers for external services
+  - ✅ Structured logging with correlation IDs
+  - ✅ Comprehensive docstrings
+  - ✅ Unit tests with mocking

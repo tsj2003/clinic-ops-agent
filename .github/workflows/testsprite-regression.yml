@@ -1,0 +1,38 @@
+name: TestSprite Portal Regression
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  testsprite-regression:
+    name: Portal Regression (TestSprite)
+    runs-on: ubuntu-latest
+    env:
+      TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
+      TESTSPRITE_BASE_URL: ${{ vars.TESTSPRITE_BASE_URL }}
+      TESTSPRITE_SUITE: ${{ vars.TESTSPRITE_SUITE || 'payer-portal-nightly' }}
+      TESTSPRITE_MIN_PASS_RATE: ${{ vars.TESTSPRITE_MIN_PASS_RATE || '0.98' }}
+      TESTSPRITE_FAILURE_WEBHOOK_URL: ${{ vars.TESTSPRITE_FAILURE_WEBHOOK_URL }}
+      TESTSPRITE_PAYER_KEY: ${{ vars.TESTSPRITE_PAYER_KEY || 'uhc' }}
+      UHC_PORTAL_CREDENTIALS: ${{ secrets.UHC_PORTAL_CREDENTIALS }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Run TestSprite portal regression intent checks
+        working-directory: web
+        run: node tests/regression/portal-testsprite.js

@@ -7,7 +7,7 @@ export default function StatusCard({ label, value, tone = 'neutral' }) {
   }[tone];
 
   return (
-    <div className={`rounded-2xl border bg-slate-900/70 p-4 shadow-soft transition-all duration-300 ${toneClass}`}>
+    <div className={`surface-stat rounded-2xl p-4 transition-all duration-300 ${toneClass}`}>
       <p className="text-xs uppercase tracking-wide text-slate-400">{label}</p>
       <p className="mt-2 text-2xl font-semibold">{value}</p>
     </div>

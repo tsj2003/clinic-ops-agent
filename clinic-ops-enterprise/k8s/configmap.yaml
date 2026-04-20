@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clinic-ops-config
+  namespace: clinic-ops
+data:
+  APP_NAME: "Clinic Ops Agent Enterprise"
+  APP_ENV: "production"
+  APP_VERSION: "2.0.0"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  PROMETHEUS_ENABLED: "true"
+  HEALTH_CHECK_ENABLED: "true"
+  HEALTH_CHECK_INTERVAL_SECONDS: "30"
+  
+  # Database
+  MONGODB_DB_NAME: "clinic_ops_production"
+  MONGODB_MAX_CONNECTIONS: "50"
+  MONGODB_MIN_CONNECTIONS: "10"
+  
+  # Cache
+  REDIS_SSL: "true"
+  REDIS_MAX_CONNECTIONS: "100"
+  
+  # Performance
+  WORKERS: "4"
+  WORKER_TIMEOUT: "120"
+  KEEP_ALIVE: "5"
+  GRACEFUL_TIMEOUT: "30"
+  
+  # Rate Limiting
+  RATE_LIMIT_STARTER: "1000"
+  RATE_LIMIT_PROFESSIONAL: "5000"
+  RATE_LIMIT_ENTERPRISE: "25000"
+  RATE_LIMIT_UNLIMITED: "100000"
+  
+  # Feature Flags
+  FEATURE_PRE_SUBMISSION_ENGINE: "true"
+  FEATURE_AI_NEGOTIATION: "true"
+  FEATURE_UNDERPAYMENT_RECOVERY: "true"
+  FEATURE_WHITE_LABEL: "true"
+  FEATURE_PHARMACY_DME: "true"
+  FEATURE_ADVANCED_STEALTH: "true"

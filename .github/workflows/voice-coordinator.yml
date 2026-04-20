@@ -1,0 +1,44 @@
+name: Voice Coordinator
+
+on:
+  schedule:
+    - cron: '30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-voice-coordinator:
+    name: Trigger IVR Status Calls
+    runs-on: ubuntu-latest
+    env:
+      FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+      TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+      TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      MONGODB_DB_NAME: ${{ vars.MONGODB_DB_NAME }}
+      AG2_COORDINATOR_URL: ${{ vars.AG2_COORDINATOR_URL }}
+      AG2_API_KEY: ${{ secrets.AG2_API_KEY }}
+      CLINIC_NAME: ${{ vars.CLINIC_NAME }}
+      CLINIC_NPI: ${{ vars.CLINIC_NPI }}
+      CLINIC_CALLBACK_NUMBER: ${{ vars.CLINIC_CALLBACK_NUMBER }}
+      VOICE_STATUS_CALLBACK_URL: ${{ vars.VOICE_STATUS_CALLBACK_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Run coordinator (best effort)
+        working-directory: web
+        run: npm run automation:voice-coordinator
