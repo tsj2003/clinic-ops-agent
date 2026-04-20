@@ -61,8 +61,10 @@ export function enforceWriteAuth(request) {
   }
 
   try {
-    const requestHost = new URL(request.url).host;
     const originHost = new URL(originHeader).host;
+    const forwardedHost = safeTrim(request.headers.get('x-forwarded-host'));
+    const hostHeader = safeTrim(request.headers.get('host'));
+    const requestHost = forwardedHost || hostHeader || new URL(request.url).host;
     if (requestHost !== originHost) {
       return NextResponse.json({ error: 'Cross-origin write requests are not allowed.' }, { status: 403 });
     }
