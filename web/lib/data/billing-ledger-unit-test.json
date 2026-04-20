@@ -12,8 +12,8 @@
       "procedureValueUsd": 950,
       "status": "refunded",
       "source": "automation",
-      "createdAt": "2026-04-17T07:38:43.579Z",
-      "refundedAt": "2026-04-17T07:38:43.583Z"
+      "createdAt": "2026-04-20T15:17:04.986Z",
+      "refundedAt": "2026-04-20T15:17:04.991Z"
     }
   ],
   "refunds": [
@@ -27,7 +27,7 @@
       "actor": "clinician",
       "status": "succeeded",
       "idempotencyKey": "refund:charge-3003:run-billing-3",
-      "createdAt": "2026-04-17T07:38:43.583Z"
+      "createdAt": "2026-04-20T15:17:04.991Z"
     }
   ],
   "events": [
@@ -38,14 +38,14 @@
       "payerReferenceId": "PAYER-REF-3003",
       "amountUsd": 50,
       "procedureValueUsd": 950,
-      "timestamp": "2026-04-17T07:38:43.579Z"
+      "timestamp": "2026-04-20T15:17:04.986Z"
     },
     {
       "type": "refund_issued",
       "runId": "run-billing-3",
       "practiceId": "practice-303",
       "amountUsd": 50,
-      "timestamp": "2026-04-17T07:38:43.583Z"
+      "timestamp": "2026-04-20T15:17:04.991Z"
     }
   ]
 }

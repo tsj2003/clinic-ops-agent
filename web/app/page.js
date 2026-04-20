@@ -33,15 +33,15 @@ const STATUS_BADGE = {
 };
 
 const DEFAULT_WORKFLOW = {
-  name: 'Awaiting default TinyFish workflow',
-  url: 'Awaiting live workflow URL',
+  name: 'Awaiting manual workflow entry',
+  url: 'Paste a policy URL in Configure',
   goal: '',
-  contactName: 'Awaiting default contact workflow',
-  contactUrl: 'Awaiting live contact URL',
-  mode: 'autoplay',
+  contactName: 'Awaiting manual contact workflow entry',
+  contactUrl: 'Paste a contact URL in Configure',
+  mode: 'manual',
   workspaceName: '',
-  caseId: 'Awaiting run',
-  procedure: 'Awaiting run',
+  caseId: 'Awaiting manual case input',
+  procedure: 'Awaiting manual case input',
 };
 
 const PILOT_WORKSPACE_TEMPLATES = {
@@ -268,7 +268,7 @@ function isSubmittedPendingProof(run = {}) {
 }
 
 export default function HomePage() {
-  const [runMode, setRunMode] = useState('default');
+  const [runMode, setRunMode] = useState('custom');
   const [uiTab, setUiTab] = useState('verdict');
   const [viewMode, setViewMode] = useState('operator');
   const [checklistState, setChecklistState] = useState({});
@@ -606,8 +606,8 @@ export default function HomePage() {
     if (uiTab === 'configure') {
       return {
         icon: '⚙️',
-        text: `Configure workflow · ${runMode === 'custom' ? 'Custom mode' : 'Autoplay mode'} · ${displayWorkflow.caseId || 'Awaiting run'}`,
-        ctaLabel: isRunning ? 'Running...' : runMode === 'custom' ? 'Run Custom Workflow' : 'Run Live Workflow',
+        text: `Configure workflow · Manual mode · ${displayWorkflow.caseId || 'Awaiting manual input'}`,
+        ctaLabel: isRunning ? 'Running...' : 'Run Live Workflow',
         ctaAction: () => {
           void runDemo(runMode);
         },
@@ -1218,18 +1218,9 @@ export default function HomePage() {
     void loadPilotCommitments();
   }, []);
 
-  useEffect(() => {
-    if (runMode !== 'default' || autoStartRef.current) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      autoStartRef.current = true;
-      runDemo('default');
-    }, 1400);
-
-    return () => clearTimeout(timer);
-  }, [runMode]);
+  // Manual-only mode: no auto-start. Users must enter case details in Configure
+  // and click Run Live Workflow to trigger a TinyFish run. This prevents any
+  // synthetic demo data from reaching the live stream.
 
   const resetRun = () => {
     setThinkingLogs([]);
@@ -1254,7 +1245,7 @@ export default function HomePage() {
     setStartedAt(null);
     setEndedAt(null);
     setStatus({ queued: 1, processing: 0, needsEvidence: 0, ready: 0 });
-    setWorkflow(runMode === 'default' ? DEFAULT_WORKFLOW : workflow);
+    setWorkflow(workflow);
     queueRef.current = [];
     processingRef.current = false;
     hasResultRef.current = false;
@@ -1282,7 +1273,7 @@ export default function HomePage() {
       Boolean(run.intake?.policyPageUrl) ||
       Boolean(run.intake?.contactPageUrl);
 
-    setRunMode(hasCustomContext ? 'custom' : 'default');
+    setRunMode('custom');
 
     if (hasCustomContext) {
       setActiveWorkspaceId(run.workspace?.id || '');
@@ -2058,11 +2049,6 @@ export default function HomePage() {
     setLiveStatus('running');
     setStatus({ queued: 0, processing: 1, needsEvidence: 0, ready: 0 });
 
-    if (modeOverride === 'default') {
-      startEventStream(new URLSearchParams());
-      return;
-    }
-
     const effectiveIntake = buildEffectiveIntake(guidedIntake, intelligenceSuggestion);
     if (
       effectiveIntake.policyPageUrl !== guidedIntake.policyPageUrl ||
@@ -2331,31 +2317,13 @@ export default function HomePage() {
 
             {showSetupPanel ? (
             <div className="glass-subpanel grid gap-3 rounded-2xl p-4">
-              <div className="grid gap-3 md:grid-cols-2">
-                <button
-                  className={`premium-button rounded-xl px-4 py-3 text-left ${
-                    runMode === 'default'
-                      ? 'border-red-500/40 bg-red-500/10 text-red-100'
-                      : 'premium-button-soft text-slate-300'
-                  }`}
-                  onClick={() => setRunMode('default')}
-                  type="button"
-                >
-                  <p className="text-base font-bold">Autoplay Live</p>
-                  <p className="mt-1 text-sm text-slate-400">Auto-run TinyFish judge on page load.</p>
-                </button>
-                <button
-                  className={`premium-button rounded-xl px-4 py-3 text-left ${
-                    runMode === 'custom'
-                      ? 'border-red-500/40 bg-red-500/10 text-red-100'
-                      : 'premium-button-soft text-slate-300'
-                  }`}
-                  onClick={() => setRunMode('custom')}
-                  type="button"
-                >
-                  <p className="text-base font-bold">Custom Live</p>
-                  <p className="mt-1 text-sm text-slate-400">Paste your own policy and contact page.</p>
-                </button>
+              <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3">
+                <p className="text-base font-bold text-red-100">Manual Entry Required</p>
+                <p className="mt-1 text-sm text-slate-300">
+                  No synthetic demo data is ever sent to TinyFish. Open{' '}
+                  <span className="font-semibold text-white">Configure</span> and paste a real payer policy URL,
+                  contact URL, and case details before running a live workflow.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

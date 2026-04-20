@@ -55,7 +55,26 @@ export async function GET(request) {
 
   const workflowUrl = safeTrim(searchParams.get('workflowUrl'));
   const contactWorkflowUrl = safeTrim(searchParams.get('contactWorkflowUrl'));
-  if (workflowUrl && !isValidHttpUrl(workflowUrl)) {
+  const payerName = safeTrim(searchParams.get('payerName'));
+  const procedureLabel = safeTrim(searchParams.get('procedureLabel'));
+  const caseLabel = safeTrim(searchParams.get('caseLabel'));
+
+  const missingFields = [];
+  if (!workflowUrl) missingFields.push('workflowUrl');
+  if (!contactWorkflowUrl) missingFields.push('contactWorkflowUrl');
+  if (!payerName) missingFields.push('payerName');
+  if (!procedureLabel) missingFields.push('procedureLabel');
+  if (!caseLabel) missingFields.push('caseLabel');
+  if (missingFields.length) {
+    return jsonError({
+      message: `Manual entry required. Missing: ${missingFields.join(', ')}. No synthetic defaults are accepted.`,
+      requestId,
+      status: 400,
+      code: 'manual_entry_required',
+    });
+  }
+
+  if (!isValidHttpUrl(workflowUrl)) {
     return jsonError({
       message: 'workflowUrl must be a valid http(s) URL.',
       requestId,
@@ -63,7 +82,7 @@ export async function GET(request) {
       code: 'invalid_workflow_url',
     });
   }
-  if (contactWorkflowUrl && !isValidHttpUrl(contactWorkflowUrl)) {
+  if (!isValidHttpUrl(contactWorkflowUrl)) {
     return jsonError({
       message: 'contactWorkflowUrl must be a valid http(s) URL.',
       requestId,

@@ -12,7 +12,7 @@
       "procedureValueUsd": 1500,
       "status": "pending",
       "source": "automation",
-      "createdAt": "2026-04-17T07:38:43.463Z",
+      "createdAt": "2026-04-20T15:17:04.973Z",
       "refundedAt": ""
     }
   ],
@@ -25,7 +25,7 @@
       "payerReferenceId": "PAYER-REF-HARD-001",
       "amountUsd": 50,
       "procedureValueUsd": 1500,
-      "timestamp": "2026-04-17T07:38:43.463Z"
+      "timestamp": "2026-04-20T15:17:04.973Z"
     }
   ]
 }
