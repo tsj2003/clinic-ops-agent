@@ -1,0 +1,31 @@
+name: Keep Render Awake
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping health endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Curl /api/health
+        env:
+          RENDER_URL: ${{ vars.RENDER_URL || 'https://clinic-ops-agent-gt7x.onrender.com' }}
+        run: |
+          echo "Pinging $RENDER_URL/api/health"
+          for attempt in 1 2 3; do
+            if curl --fail --silent --show-error --max-time 60 \
+                    "$RENDER_URL/api/health" \
+                    -o /tmp/health.json; then
+              echo "Attempt $attempt: OK"
+              cat /tmp/health.json
+              exit 0
+            fi
+            echo "Attempt $attempt failed, retrying in 15s..."
+            sleep 15
+          done
+          echo "Health check failed after 3 attempts"
+          exit 1
